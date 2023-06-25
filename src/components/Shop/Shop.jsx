@@ -7,11 +7,10 @@ import { Link } from 'react-router-dom';
 
 const Shop = () => {
     const [products, setProducts] = useState([]);
-
     const [cart, setCart] = useState([])
-
+    const{totalProducts}= useLoaderData();
     useEffect(() => {
-        fetch('products.json')
+        fetch('http://localhost:5000/products')
             .then(res => res.json())
             .then(data => setProducts(data))
     }, []);
@@ -26,7 +25,7 @@ const Shop = () => {
         for (const id in storedCart) {
 
             //step-2 get the product by using id
-            const addedProduct = products.find(product => product.id === id)
+            const addedProduct = products.find(product => product._id === id)
             // console.log(savedProducts);
             if (addedProduct) {
                 // step-3 get the quantity of the product
@@ -45,7 +44,7 @@ const Shop = () => {
         // console.log(product);
         const newCart = [...cart, product];
         setCart(newCart);
-        addToDb(product.id)
+        addToDb(product._id)
     }
 
     const handleClearCart=()=>{
@@ -59,7 +58,7 @@ const Shop = () => {
             <div className="products-container">
                 {
                     products.map(product => <Product
-                        key={product.id}
+                        key={product._id}
                         product={product}
                         handleAddToCart={handleAddToCart}
 
