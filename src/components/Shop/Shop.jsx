@@ -9,21 +9,31 @@ const Shop = () => {
     const [products, setProducts] = useState([]);
     const [cart, setCart] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
-    const [itemsPerPage,setItemsPerPage]=useState(10);
+    const [itemsPerPage, setItemsPerPage] = useState(9);
     const { totalProducts } = useLoaderData();
     console.log(totalProducts);
 
-    
+
     const totalPages = Math.ceil(totalProducts / itemsPerPage);
 
     const pageNumbers = [...Array(totalPages).keys()];
 
 
+    // useEffect(() => {
+    //     fetch('http://localhost:5000/products')
+    //         .then(res => res.json())
+    //         .then(data => setProducts(data))
+    // }, []);
+
+
     useEffect(() => {
-        fetch('http://localhost:5000/products')
-            .then(res => res.json())
-            .then(data => setProducts(data))
-    }, []);
+        async function fetchData() {
+            const response = await fetch(`http://localhost:5000/products?page=${currentPage}&limit=${itemsPerPage}`);
+            const data = await response.json();
+            setProducts(data);
+        }
+        fetchData();
+    }, [currentPage, itemsPerPage]);
 
 
     useEffect(() => {
@@ -62,6 +72,13 @@ const Shop = () => {
         deleteShoppingCart();
     }
 
+    const options = [5, 10, 20];
+
+    function handleSelectChange(event) {
+        setItemsPerPage(parseInt(event.target.value));
+        setCurrentPage(0);
+    }
+
     return (
         <>
             <div className='shop-container'>
@@ -92,14 +109,23 @@ const Shop = () => {
             {/* pagination */}
 
             <div className='pagination'>
-                <p> Current Page: {currentPage}</p>
-                    {
-                        pageNumbers.map(number=>
+                <p> Current Page: {currentPage}, Items Per Page : {itemsPerPage}</p>
+                {
+                    pageNumbers.map(number =>
                         <button key={number}
-                        onClick={()=>setCurrentPage(number)}
+                            onClick={() => setCurrentPage(number)}
+                            className={currentPage === number ? 'selected' : ''}
                         >{number}
                         </button>)
+                }
+                <select value={itemsPerPage} onChange={handleSelectChange}>
+                    {
+                        options.map(option =>
+                            <option key={option} value={option}>
+                                {option}
+                            </option>)
                     }
+                </select>
             </div>
         </>
     );
