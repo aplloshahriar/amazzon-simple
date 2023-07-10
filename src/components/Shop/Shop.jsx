@@ -37,15 +37,27 @@ const Shop = () => {
 
 
     useEffect(() => {
-        const storedCart = getShoppingCart()
-        // console.log(storedCart);
+        const storedCart = getShoppingCart();
+        const storedCartId = Object.keys(storedCart);
+
+        fetch(`http://localhost:5000/productsById`, {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify(storedCartId)
+        })
+        .then(res=>res.json())
+        .then(cartProducts=>{
+
+            // console.log(storedCart);
         const savedCart = [];
 
         // step-1 get id
         for (const id in storedCart) {
 
             //step-2 get the product by using id
-            const addedProduct = products.find(product => product._id === id)
+            const addedProduct = cartProducts.find(product => product._id === id)
             // console.log(savedProducts);
             if (addedProduct) {
                 // step-3 get the quantity of the product
@@ -58,7 +70,9 @@ const Shop = () => {
         }
         // step-5 set the cart
         setCart(savedCart);
-    }, [products])
+        })
+        
+    }, [])
 
     const handleAddToCart = (product) => {
         // console.log(product);
@@ -109,13 +123,13 @@ const Shop = () => {
             {/* pagination */}
 
             <div className='pagination'>
-                <p> Current Page: {currentPage}, Items Per Page : {itemsPerPage}</p>
+                <p> Current Page: {currentPage + 1}, Items Per Page : {itemsPerPage}</p>
                 {
                     pageNumbers.map(number =>
                         <button key={number}
                             onClick={() => setCurrentPage(number)}
                             className={currentPage === number ? 'selected' : ''}
-                        >{number}
+                        >{number +1}
                         </button>)
                 }
                 <select value={itemsPerPage} onChange={handleSelectChange}>
